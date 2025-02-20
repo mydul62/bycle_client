@@ -1,4 +1,4 @@
-import { selectCurrentUser } from "@/app/redux/api/features/auth/authslice"
+// import { selectCurrentUser } from "@/app/redux/api/features/auth/authslice"
 import { IBicycle } from "@/app/redux/features/productsSlice"
 import { Button } from "@/components/ui/button"
 import { FiShoppingCart } from "react-icons/fi"

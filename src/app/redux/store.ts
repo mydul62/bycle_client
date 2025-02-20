@@ -4,7 +4,6 @@ import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' 
 import authReducer from "./api/features/auth/authslice"
 import productReducer from './api/features/product/productSlice';
-
 const persistConfig = {
   key: 'auth',
   storage,
@@ -17,7 +16,8 @@ export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
     auth: persistedAuthReducer,
-    Product: persistedProductReducer 
+    Product: persistedProductReducer ,
+    
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(baseApi.middleware),

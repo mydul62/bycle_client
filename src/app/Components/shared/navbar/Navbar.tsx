@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart, Phone, ChevronDown, Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import {
@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAppSelector } from "@/app/redux/hook";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -22,10 +23,13 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [cartCount] = useState(100);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
+  const carts= useAppSelector((state) => state.Product.items);
+  const navigate  = useNavigate()
+  
+  
+  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -97,12 +101,12 @@ export default function Navbar() {
 
         </div>
           {/* Cart Icon */}
-          <div className="relative cursor-pointer">
+          <div onClick={()=>{navigate("/shoppingcart")}} className="relative cursor-pointer">
             <div className="relative bg-red-500 rounded-full p-4">
               <ShoppingCart size={15} color="white" />
             </div>
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#1b3e41] text-white text-xs px-2 py-1 rounded-full">{cartCount}</span>
+            {carts?.length > 0 && (
+              <span  className="absolute -top-2 -right-2 bg-[#1b3e41] text-white text-xs px-2 py-1 rounded-full">{carts?.length}</span>
             )}
           </div>
 

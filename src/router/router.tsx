@@ -5,6 +5,7 @@ import ShoppingCart from "@/app/Components/models/shopingCart/ShoppingCard";
 import About from "@/app/pages/about/About";
 import Login from "@/app/pages/Auth/login/Login";
 import Register from "@/app/pages/Auth/register/Register";
+import CheckoutPage from "@/app/pages/checkout/CheckOutpage";
 import ContactUs from "@/app/pages/contact/Contact";
 import Home from "@/app/pages/home/Home";
 import Shop from "@/app/pages/shop/Shop";
@@ -36,6 +37,10 @@ import { createBrowserRouter } from "react-router-dom";
     {
       path:'/shoppingcart',
       element:<ShoppingCart/>
+    },
+    {
+      path:'/checkout',
+      element:<CheckoutPage/>
     },
     {
       path:'/contact',
