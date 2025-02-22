@@ -10,16 +10,24 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-
+import { toast } from 'sonner';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "./loginSchema";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/app/redux/api/features/auth/authApi";
-import { verifyToken } from "@/app/utils/verifyToken";
-
+import { jwtDecode } from "jwt-decode";
+import { useAppDispatch } from "@/app/redux/hook";
+import { setUser } from "@/app/redux/api/features/auth/authslice";
+type DecodedToken = {
+  userId: string; 
+};
 export default function LoginForm() {
+ const toastId = 'Loading....'
 const navigate = useNavigate()
+const location = useLocation();
+const redirectTo = (location.state as any)?.from || '/'; 
   const [login, { isLoading, error }] = useLoginMutation();
+  const dispatch = useAppDispatch()
   const form = useForm({
     resolver: zodResolver(loginSchema),
   });
@@ -32,10 +40,17 @@ const navigate = useNavigate()
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const res = await login(data).unwrap();
-     if(res.success){
-      navigate("/shop")
-     }
-    console.log(verifyToken(res.data.token))
+    console.log(res)
+    if (res?.data){
+      const decoded = jwtDecode<DecodedToken>(res.data);
+      console.log(decoded)
+      dispatch(setUser({ token: res.data, user: decoded.userId }));
+      navigate(redirectTo);
+      toast.success("Successfully logged in!", { id: toastId });
+    } else {
+      toast.error("Invalid email or password");
+    }
+ 
   };
 
   return (

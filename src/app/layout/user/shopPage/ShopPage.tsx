@@ -8,7 +8,7 @@ import { useState } from "react";
 import ShopCard from "@/app/Components/models/shopCard/ShopCard";
 import { useGetAllProductQuery } from "@/app/redux/api/features/product/productApi";
 
-const Shop = () => {
+const ShopPage = () => {
   const [priceRange, setPriceRange] = useState([10, 3760]);
   const {data}=useGetAllProductQuery(undefined)
  console.log(data?.data)
@@ -88,4 +88,4 @@ const Shop = () => {
   );
 };
 
-export default Shop;
+export default ShopPage;

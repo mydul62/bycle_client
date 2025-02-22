@@ -2,8 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { FiHeart, FiClipboard } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import ShopCard from "../../shopCard/ShopCard";
+
 import { useGetAllProductQuery } from "@/app/redux/api/features/product/productApi";
+import ShopCard from "@/app/Components/models/shopCard/ShopCard";
 
 
 

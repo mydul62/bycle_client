@@ -20,6 +20,10 @@ type RegistrationFormData = {
   email: string;
   password: string;
   passwordConfirm: string;
+  phone: string;
+  gender: string;
+  dateOfBirth: string;
+  photo: string;
 };
 
 export default function RegisterForm() {
@@ -33,6 +37,10 @@ export default function RegisterForm() {
       email: "",
       password: "",
       passwordConfirm: "",
+      phone: "",
+      gender: "",
+      dateOfBirth: "",
+      photo: "",
     },
   });
 
@@ -45,11 +53,15 @@ export default function RegisterForm() {
     name,
     email,
     password,
+    phone,
+    gender,
+    dateOfBirth,
+    photo,
   }) => {
-    console.log("Form Submitted:", { name, email, password });
+    console.log("Form Submitted:", { name, email, password, phone, gender, dateOfBirth, photo });
 
     try {
-      const res = await register({ name, email, password }).unwrap();
+      const res = await register({ name, email, password, phone, gender, dateOfBirth, photo }).unwrap();
       if (res.success) {
         navigate("/login");
       }
@@ -70,32 +82,35 @@ export default function RegisterForm() {
       </div>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormField
-            control={control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage>{errors.name?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" {...field} />
-                </FormControl>
-                <FormMessage>{errors.email?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage>{errors.name?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" {...field} />
+                  </FormControl>
+                  <FormMessage>{errors.email?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={control}
             name="password"
@@ -103,7 +118,7 @@ export default function RegisterForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input   type="password" {...field} />
+                  <Input type="password" {...field} />
                 </FormControl>
                 <FormMessage>{errors.password?.message}</FormMessage>
               </FormItem>
@@ -121,6 +136,62 @@ export default function RegisterForm() {
                 {password !== passwordConfirm && (
                   <FormMessage>Passwords do not match</FormMessage>
                 )}
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input type="tel" {...field} />
+                  </FormControl>
+                  <FormMessage>{errors.phone?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gender</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage>{errors.gender?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={control}
+            name="dateOfBirth"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date of Birth</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage>{errors.dateOfBirth?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="photo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Photo URL</FormLabel>
+                <FormControl>
+                  <Input type="url" {...field} />
+                </FormControl>
+                <FormMessage>{errors.photo?.message}</FormMessage>
               </FormItem>
             )}
           />

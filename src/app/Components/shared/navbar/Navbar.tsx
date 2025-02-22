@@ -11,7 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAppSelector } from "@/app/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/app/redux/hook";
+import { logout } from "@/app/redux/api/features/auth/authslice";
+import { UserInterface } from "@/app/types/types";
+import { jwtDecode } from "jwt-decode";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -27,9 +30,18 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const carts= useAppSelector((state) => state.Product.items);
   const navigate  = useNavigate()
+  const dispatch = useAppDispatch()
+   const token = useAppSelector(state => state.auth.token);
+    let userInfo: UserInterface | null = null; 
   
-  
-  
+    if (token) {
+      try {
+        userInfo = jwtDecode<UserInterface>(token);
+        console.log(userInfo)
+      } catch (error) {
+        console.error("Invalid token", error);
+      }
+    }
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -80,22 +92,24 @@ export default function Navbar() {
         <div>
         <DropdownMenu>
   <DropdownMenuTrigger>
-  <Avatar className="">
-  <AvatarImage src="https://github.com/shadcn.png"  className="w-16"/>
-  <AvatarFallback>CN</AvatarFallback>
-</Avatar>
+      <span title="click here" className=" bg-black text-white p-4 rounded-full">M</span>
 
   </DropdownMenuTrigger>
   <DropdownMenuContent>
     <DropdownMenuLabel>My Account</DropdownMenuLabel>
     <DropdownMenuSeparator />
     <DropdownMenuItem>
-    <Link to={"/login"}>Login</Link>
+    {
+      token?<span onClick={()=>{dispatch(logout())}}>Logout</span> :<Link to={"/login"}>Login</Link>
+    }
+    
     </DropdownMenuItem>
     <DropdownMenuItem>
-    <Link to={"/login"}>Dashboard</Link>
+    {
+    userInfo?.role=="admin" && <Link to={"/dashboard"}>Dashboard</Link>
+    }
+    
     </DropdownMenuItem>
-    <DropdownMenuItem>Logout</DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>
 

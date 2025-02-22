@@ -1,10 +1,10 @@
 // import { selectCurrentUser } from "@/app/redux/api/features/auth/authslice"
-import { IBicycle } from "@/app/redux/features/productsSlice"
+import { IProduct } from "@/app/types/types";
 import { Button } from "@/components/ui/button"
 import { FiShoppingCart } from "react-icons/fi"
 import { Link } from "react-router-dom"
  type Tbike ={
-  bike: IBicycle ;
+  bike: IProduct ;
  }
 const ShopCard = ({bike}:Tbike) => {
 console.log(bike)
@@ -12,13 +12,13 @@ console.log(bike)
   return (
     <div
     key={bike?._id}
-    className="bg-white overflow-hidden relative transition duration-300 group"
+    className="bg-white overflow-hidden   relative transition duration-300 group"
   >
-    {/* {bike.tags && (
+    {bike.tags && (
       <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
         {bike.tags}
       </span>
-    )} */}
+    )}
     <div className="relative border-b ">
       <img
         src={bike.image_url}

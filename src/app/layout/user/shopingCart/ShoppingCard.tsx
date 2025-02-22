@@ -3,13 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FaTruck, FaRegTimesCircle } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/app/redux/hook";
 import { getTotalPrice, removeFromCart, updateQuantity } from "@/app/redux/api/features/product/productSlice";
 import { RootState } from "@/app/redux/store";
 
 const ShoppingCart: React.FC = () => {
+const navigate = useNavigate()
   const carts = useAppSelector((state) => state.Product.items);
+  console.log(carts)
   const dispatch = useAppDispatch();
   const totalPrice = useAppSelector((state: RootState) => getTotalPrice(state.Product));
 
@@ -50,7 +52,7 @@ const ShoppingCart: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto w-[90%] my-24 flex flex-col gap-10">
+      <div className="max-w-5xl mx-auto w-[90%] py-24 flex flex-col gap-10">
         {/* Cart Table */}
         <Card className="shadow-none">
           <CardContent className="p-6">
@@ -118,7 +120,7 @@ const ShoppingCart: React.FC = () => {
         </div>
 
         {/* Checkout Button */}
-        <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-8 text-lg">
+        <Button onClick={()=>{navigate('/checkout')}}  className="w-full bg-red-500 hover:bg-red-600 text-white py-8 text-lg">
           Proceed to checkout
         </Button>
       </div>
