@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { IoFilterSharp } from "react-icons/io5";
@@ -18,18 +19,22 @@ const ShopPage = () => {
 
   const { data, isLoading } = useGetAllProductQuery({
     search: searchTerm,
-    minPrice: priceRange[0],
-    maxPrice: priceRange[1],
   });
 
-  const categories = [
-    "Bicycles",
-    "Integrated lighting",
-    "IsoSpeed",
-    "Plus size tires",
-    "Reactive suspension",
-    "Step-through frame",
-  ];
+  const bicycles = data?.data;
+
+  let categories: any[] = [];
+  
+  // Check if bicycles data is available
+  if (bicycles) {
+    const uniqueCategories = new Set();
+
+    bicycles.forEach((b: { category: string }) => {
+      uniqueCategories.add(b.category);
+    });
+
+    categories = Array.from(uniqueCategories);
+  }
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -39,24 +44,28 @@ const ShopPage = () => {
     );
   };
 
-  const filteredProducts = data?.data?.filter((product: IProduct) =>
-    selectedCategories.length
+  const filteredProducts = data?.data?.filter((product: IProduct) => {
+    const isPriceFiltered = priceRange[0] !== 10 || priceRange[1] !== 100000;
+    const isWithinPriceRange = !isPriceFiltered || (product.price >= priceRange[0] && product.price <= priceRange[1]);
+    
+    const isInSelectedCategory = selectedCategories.length
       ? selectedCategories.includes(product.category)
-      : true
-  ) || [];
-
+      : true;
+  
+    return isWithinPriceRange && isInSelectedCategory;
+  }) || [];
+  
   const paginatedProducts = filteredProducts.slice((page - 1) * limit, page * limit);
 
   useEffect(() => {
     if (data?.data) {
       setPage(1);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategories, searchTerm, priceRange]);
 
   return (
     <div className="bg-[#f0f2f2] relative">
-        <div
+      <div
         style={{
           backgroundImage: "url('https://i.ibb.co/k2rdkVtn/image-6.jpg')",
           backgroundRepeat: "no-repeat",
@@ -77,7 +86,7 @@ const ShopPage = () => {
         </div>
       </div>
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-7 gap-4 md:gap-6 p-4 md:p-6">
-        <div className="md:col-span-2 sticky top-[85px] self-start">
+        <div className="md:col-span-2 md:sticky top-[85px] self-start">
           <aside className="w-full space-y-4 md:space-y-6 bg-white p-4 md:p-6">
             <Input
               placeholder="Search for products..."
@@ -85,7 +94,7 @@ const ShopPage = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <div className="space-y-4 md:space-y-6">
+            <div className="space-y-4 md:space-y-6 hidden md:block">
               <h2 className="font-semibold flex items-center gap-2 text-sm md:text-base">
                 <IoFilterSharp /> Filter
               </h2>
@@ -96,7 +105,7 @@ const ShopPage = () => {
                 onValueChange={(val) => setPriceRange(val as [number, number])}
               />
               <p className="text-xs md:text-sm text-gray-600">
-                Price: ${priceRange[0]} — ${priceRange[1]}
+                Price: ${priceRange[0]}
               </p>
               <h3 className="font-semibold text-sm md:text-base">Category</h3>
               {categories.map((category) => (

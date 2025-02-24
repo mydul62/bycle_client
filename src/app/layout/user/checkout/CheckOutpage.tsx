@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,12 +24,16 @@ export default function CheckoutPage() {
   const carts = useAppSelector((state) => state.Product.items);
   const totalPrice = useAppSelector((state) => getTotalPrice(state.Product));
   const { data: user } = useGetSingleUserQuery(undefined);
-  const email = user?.data?.email;
+  const singleUser = user?.data;
+const email=singleUser?.email
+const phone=singleUser?.phone
+const name =singleUser?.name
 
   // Checkbox state
   const [termsChecked, setTermsChecked] = useState<boolean>(false);
 
   const onSubmit = async (data: any) => {
+  console.log(data)
     setProcessing(true); // Start the processing immediately when the button is clicked
 
     // Simulate a wait period of 3 seconds before actually placing the order
@@ -89,19 +93,19 @@ export default function CheckoutPage() {
             <div className="space-y-5">
               <div>
                 <Label htmlFor="firstName">First name *</Label>
-                <Input className="rounded-none py-6" id="firstName" {...register("firstName", { required: true })} />
+                <Input value={name} disabled className="rounded-none py-6" id="firstName" {...register("firstName", { required: true })} />
               </div>
               <div>
-                <Label htmlFor="lastName">Last name *</Label>
-                <Input className="rounded-none py-6" id="lastName" {...register("lastName", { required: true })} />
+                <Label  htmlFor="lastName">Last name *</Label>
+                <Input value={"customer"} className="rounded-none py-6" id="lastName" {...register("lastName", { required: true })} />
               </div>
               <div>
                 <Label htmlFor="email">Email *</Label>
-                <Input className="rounded-none py-6" id="email" {...register("email", { required: true })} />
+                <Input value={email} disabled className="rounded-none py-6" id="email" {...register("email", { required: true })} />
               </div>
               <div>
                 <Label htmlFor="phone">Phone *</Label>
-                <Input className="rounded-none py-6" id="phone" {...register("phone", { required: true })} />
+                <Input  value={phone} className="rounded-none py-6" id="phone" {...register("phone", { required: true })} />
               </div>
               <div>
                 <Label>Country / Region *</Label>

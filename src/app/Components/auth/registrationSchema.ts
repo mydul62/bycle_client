@@ -12,7 +12,7 @@ export const registrationSchema = z.object({
   
   password: z
     .string({ required_error: "Password is required" })
-    .min(8, "Password must be at least 8 characters"),
+    .min(4, "Password must be at least 4 characters"),
   
   passwordConfirm: z
     .string({ required_error: "Password confirmation is required" })
@@ -23,18 +23,6 @@ export const registrationSchema = z.object({
     .min(10, "Phone number must be at least 10 characters")
     .max(15, "Phone number must be at most 15 characters")
     .regex(/^[0-9\-\+\(\)]+$/, "Phone number must be valid"),
-
-  gender: z
-    .string({ required_error: "Gender is required" })
-    .refine((val) => ["male", "female", "other"].includes(val), {
-      message: "Gender must be one of 'male', 'female', or 'other'",
-    }),
-
-  dateOfBirth: z
-    .string({ required_error: "Date of birth is required" })
-    .refine((val) => !isNaN(Date.parse(val)), {
-      message: "Invalid date format",
-    }),
 
   photo: z
     .string({ required_error: "Photo URL is required" })

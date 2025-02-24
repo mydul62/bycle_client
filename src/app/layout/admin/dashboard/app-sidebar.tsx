@@ -7,7 +7,6 @@ import {
   FaCog 
 } from "react-icons/fa";
 import { IoIosLogOut } from "react-icons/io";
-import { ImUser } from "react-icons/im";
 import { RxCheckCircled } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import { useGetSingleUserQuery } from "@/app/redux/api/features/auth/authApi";
@@ -55,18 +54,24 @@ export function AppSidebar() {
       <SidebarContent className="justify-between pb-10">
         <SidebarGroup>
           {/* Sidebar Logo */}
-          <SidebarGroupLabel>
+          <SidebarGroupLabel className="flex justify-start gap-2">
             <Link to={"/"}>
               <span className="text-red-500">Bicycle</span>
               <span className="text-black">Zone.</span>
             </Link>
+            <div>/</div>
+            <div>
+             <Link className="text-sm" to={'/'}>Home</Link>
+            </div>
           </SidebarGroupLabel>
 
           <SidebarGroupContent>
             {/* User Info Card */}
             <Card className="w-full p-4 border-none shadow-none bg-transparent rounded-none">
               <CardContent className="flex flex-col items-center border-b space-y-2">
-                <ImUser size={100} />
+               <div className=" h-20 w-20 rounded-full">
+               <img src={currentUser?.photo} alt=" " className="rounded-full" />
+               </div>
                 <h2 className="font-semibold uppercase">{currentUser?.name}</h2>
                 <h4 className="text-gray-600">{currentUser?.role}</h4>
                 <p className="text-gray-500 text-sm">{email}</p>

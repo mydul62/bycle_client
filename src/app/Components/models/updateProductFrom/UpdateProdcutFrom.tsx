@@ -1,13 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { RxCross2 } from "react-icons/rx";
-import {  useGetSingleProductQuery, useUpdateProductMutation } from "@/app/redux/api/features/product/productApi";
+import { useGetSingleProductQuery, useUpdateProductMutation } from "@/app/redux/api/features/product/productApi";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import { useImageUpload } from "@/hooks/hooks";
+
 
 interface Color {
   name: string;
@@ -35,14 +37,16 @@ export default function UpdateProductForm() {
   const { id } = useParams();
   const { data, error, isLoading } = useGetSingleProductQuery(id);
   const product = data?.data;
-const navigate = useNavigate()
+  const navigate = useNavigate();
   const { register, handleSubmit, control, reset, formState: { errors } } = useForm<ProductFormData>();
-
   const { fields, append, remove } = useFieldArray({
     control,
     name: "colors",
   });
 
+  const { uploadImage, uploading } = useImageUpload();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [updateProduct] = useUpdateProductMutation();
 
   // useEffect to set form values when product data is available
@@ -61,24 +65,39 @@ const navigate = useNavigate()
         category: product.category,
         tags: product.tags,
         image_url: product.image_url,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        colors: product.colors?.map((color: { name: any; hex: any; }) => ({ name: color.name, hex: color.hex })) || [],
+        colors: product.colors?.map((color: { name: any; hex: any }) => ({ name: color.name, hex: color.hex })) || [],
       });
+      setImagePreview(product.image_url);
     }
   }, [product, reset]);
 
-  const onSubmit = async (newdata: ProductFormData) => {
-    try {
-
-    if(data){
-      const  res= await updateProduct({ id, newdata }).unwrap();
-      if(res.success){
-        toast.success('Product updated Successfully')
-        reset(); 
-        navigate("/dashboard/allproducts")
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const uploadedUrl = await uploadImage(file);
+      if (uploadedUrl) {
+        setUploadedImageUrl(uploadedUrl);
+        setImagePreview(uploadedUrl); // Update image preview on successful upload
+      } else {
+        console.log("Image upload failed");
       }
-        
     }
+  };
+
+  const onSubmit = async (updatedData: ProductFormData) => {
+  
+    try {
+      // Update the product with the uploaded image URL if it's changed
+      if (uploadedImageUrl) {
+        updatedData.image_url = uploadedImageUrl;
+      }
+        console.log(id,updatedData)
+      const res = await updateProduct({ id, updatedData }).unwrap();
+      if (res.success) {
+        toast.success("Product updated successfully!");
+        console.log(res)
+        navigate("/dashboard/allproducts");
+      }
     } catch (error) {
       console.error("Failed to update the product:", error);
     }
@@ -130,9 +149,14 @@ const navigate = useNavigate()
               <Input value="Bicycles" disabled className="bg-gray-200 cursor-not-allowed" />
             </div>
             <div>
-              <label className="block font-medium">Image URL</label>
-              <Input {...register("image_url", { required: "Image URL is required" })} placeholder="Image URL" />
-              {errors.image_url && <span className="text-red-500">{errors.image_url.message}</span>}
+              <label className="block font-medium">Image</label>
+              <Input type="file" accept="image/*" onChange={handleImageChange} />
+              {uploading && <p className="text-sm text-gray-500">Uploading image...</p>}
+              {imagePreview && (
+                <div className="mt-2">
+                  <img src={imagePreview} alt="Product preview" className="w-32 h-32 object-cover" />
+                </div>
+              )}
             </div>
           </div>
           <div>

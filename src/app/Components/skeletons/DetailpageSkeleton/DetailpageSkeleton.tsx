@@ -1,4 +1,4 @@
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
 import { FiStar } from "react-icons/fi";
 import { Skeleton } from "@/components/ui/skeleton";
 

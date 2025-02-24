@@ -38,5 +38,6 @@ export const orderApi = baseApi.injectEndpoints({
 export const {
     useGetVerifyOrderQuery,
  useCreateOrderMutation,
- useGetAllOrderQuery
+ useGetAllOrderQuery,
+useDeleteOrderMutation
 } = orderApi;

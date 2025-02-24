@@ -39,16 +39,15 @@ const authApi = baseApi.injectEndpoints({
     // Update User Profile (Admin/User)
     updateUser: builder.mutation({
       query: (userData) => ({
-        url: 'auth//updateuser',
+        url: `auth/updateuser/${userData}`,
         method: 'PUT',
-        body: userData,
       }),
     }),
 
     // Update User Role (Admin only)
     updateRole: builder.mutation({
       query: ({ id, role }) => ({
-        url: `auth//updateRole/${id}`,
+        url: `auth/updateRole/${id}`,
         method: 'PUT',
         body: { role },
       }),
@@ -57,7 +56,7 @@ const authApi = baseApi.injectEndpoints({
     // Delete User (Admin only)
     deleteUser: builder.mutation({
       query: (id) => ({
-        url: `auth//deletedUsers/${id}`,
+        url: `auth/deletedUsers/${id}`,
         method: 'DELETE',
       }),
     }),

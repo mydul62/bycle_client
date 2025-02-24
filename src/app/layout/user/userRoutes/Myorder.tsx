@@ -4,7 +4,9 @@ import { useGetAllOrderQuery } from "@/app/redux/api/features/order/orderApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search } from "lucide-react";
+import { Search} from "lucide-react";
+import { toast } from "sonner";
+import AllUsersSkeleton from "@/app/Components/skeletons/AllUsersSkeleton";
 
 interface Order {
   _id: string;
@@ -36,18 +38,19 @@ interface Order {
   }[];
 }
 
-const Myorder = () => {
-  const { data } = useGetAllOrderQuery(undefined);
-  const { data: user } = useGetSingleUserQuery(undefined);
+const MyOrder = () => {
+  const { data, isLoading, error } = useGetAllOrderQuery(undefined);
+  const { data: user, isLoading: userLoading, error: userError } = useGetSingleUserQuery(undefined);
   const email = user?.data?.email;
   const [searchQuery, setSearchQuery] = useState("");
 
-  const myorders: Order[] = data?.data || [];
-  const newmyorders: Order[] = myorders.filter(
-    (order) => order.email === email
-  );
+  if (error || userError) {
+    toast.error("Failed to load orders. Please try again.");
+  }
 
-  const filteredOrders = newmyorders.filter(
+  const myOrders: Order[] = data?.data || [];
+  const newMyOrders: Order[] = myOrders.filter((order) => order.email === email);
+  const filteredOrders = newMyOrders.filter(
     (order) =>
       order._id.includes(searchQuery) || order.transaction.id.includes(searchQuery)
   );
@@ -59,7 +62,7 @@ const Myorder = () => {
         <div className="relative w-full md:w-1/3">
           <Input
             placeholder="Search by Order ID or Transaction ID..."
-            className="pl-10"
+            className="pl-10 pr-4 py-2 w-full"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -67,41 +70,47 @@ const Myorder = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {filteredOrders.length > 0 ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Total Price</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Order Date</TableHead>
-                <TableHead>Transaction ID</TableHead>
-                <TableHead>Bank Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredOrders.map((order) => (
-                <TableRow key={order._id} className="hover:bg-gray-100">
-                  <TableCell>{order._id}</TableCell>
-                  <TableCell>{order.firstName} {order.lastName}</TableCell>
-                  <TableCell>{order.email}</TableCell>
-                  <TableCell>{order.phone}</TableCell>
-                  <TableCell>${order.totalPrice.toLocaleString()}</TableCell>
-                  <TableCell className={`font-bold ${order.status === "Paid" ? "text-green-500" : "text-red-500"}`}>
-                    {order.status}
-                  </TableCell>
-                  <TableCell>{new Date(order.orderDate).toLocaleString()}</TableCell>
-                  <TableCell>{order.transaction.id}</TableCell>
-                  <TableCell className={order.transaction.bank_status === "Failed" ? "text-red-500" : "text-green-500"}>
-                    {order.transaction.bank_status}
-                  </TableCell>
+        {isLoading || userLoading ? (
+          <div className="flex justify-center items-center py-10">
+            <AllUsersSkeleton></AllUsersSkeleton>
+          </div>
+        ) : filteredOrders.length > 0 ? (
+          <div className="overflow-x-auto">
+            <Table className="w-full">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order ID</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Total Price</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Order Date</TableHead>
+                  <TableHead>Transaction ID</TableHead>
+                  <TableHead>Bank Status</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredOrders.map((order) => (
+                  <TableRow key={order._id} className="hover:bg-gray-100">
+                    <TableCell>{order._id}</TableCell>
+                    <TableCell>{order.firstName} {order.lastName}</TableCell>
+                    <TableCell>{order.email}</TableCell>
+                    <TableCell>{order.phone}</TableCell>
+                    <TableCell>${order.totalPrice.toLocaleString()}</TableCell>
+                    <TableCell className={`font-bold ${order.status === "Paid" ? "text-green-500" : "text-red-500"}`}>
+                      {order.status}
+                    </TableCell>
+                    <TableCell>{new Date(order.orderDate).toLocaleString()}</TableCell>
+                    <TableCell>{order.transaction.id}</TableCell>
+                    <TableCell className={order.transaction.bank_status === "Failed" ? "text-red-500" : "text-green-500"}>
+                      {order.transaction.bank_status}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         ) : (
           <p className="text-center text-gray-500">No orders found</p>
         )}
@@ -111,4 +120,4 @@ const Myorder = () => {
   );
 };
 
-export default Myorder;
+export default MyOrder;

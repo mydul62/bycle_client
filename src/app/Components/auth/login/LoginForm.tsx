@@ -56,7 +56,7 @@ const redirectTo = (location.state as any)?.from || '/';
   };
 
   return (
-    <div className="border-2 border-gray-300 rounded-xl flex-grow max-w-md w-full p-5">
+    <div className="border-2 border-gray-300 rounded-xl flex-grow max-w-md w-[98%] p-5">
       <div className="flex items-center space-x-4 ">
         <div className=" mb-4">
           <h1 className="text-xl font-semibold">Login</h1>

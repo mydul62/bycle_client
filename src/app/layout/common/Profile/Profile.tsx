@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useForm } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -5,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Pencil } from "lucide-react";
-import { useChangePasswordMutation } from "@/app/redux/api/features/auth/authApi";
-import { toast } from "sonner"; // ✅ Using Sonner for toast notifications
+import { useChangePasswordMutation, useGetSingleUserQuery, useUpdateUserMutation } from "@/app/redux/api/features/auth/authApi";
+import { toast } from "sonner";
+import { useState } from "react";
+import { useImageUpload } from "@/hooks/hooks";
+
 
 // Form data interface
 interface PasswordChangeForm {
@@ -18,6 +22,11 @@ interface PasswordChangeForm {
 const Profile = () => {
   const { register, handleSubmit, reset } = useForm<PasswordChangeForm>();
   const [changePassword] = useChangePasswordMutation();
+  const { data: user } = useGetSingleUserQuery(undefined);
+  const [updateUser] = useUpdateUserMutation();
+  const { uploadImage } = useImageUpload(); // Use the hook
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const currentUser = user?.data;
 
   const onSubmit = async (data: PasswordChangeForm) => {
     if (data.newPassword !== data.confirmNewPassword) {
@@ -38,6 +47,27 @@ const Profile = () => {
     }
   };
 
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const uploadedImageUrl = await uploadImage(file);
+      if (uploadedImageUrl) {
+        setPreviewImage(uploadedImageUrl);
+        try {
+        console.log({ photo: uploadedImageUrl })
+        const photo=uploadedImageUrl 
+          const res = await updateUser(photo) // Unwrap the response
+          console.log("Updated User:", res);
+        } catch (error) {
+          console.error("Update failed:", error);
+        }
+      } else {
+        toast.error("Failed to upload image.");
+      }
+    }
+  };
+  
+
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       {/* User Profile Section */}
@@ -45,16 +75,17 @@ const Profile = () => {
         <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8 bg-gradient-to-r from-gray-100 to-gray-200">
           <div className="relative">
             <Avatar className="w-24 h-24 border-2 border-gray-400">
-              <AvatarImage src="https://via.placeholder.com/150" alt="User Avatar" />
+              <AvatarImage src={previewImage || currentUser?.photo} alt="User Avatar" />
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
-            <div className="absolute bottom-1 right-1 bg-white p-1 rounded-full shadow-md cursor-pointer hover:bg-gray-200 transition">
+            <label htmlFor="photo-upload" className="absolute bottom-1 right-1 bg-white p-1 rounded-full shadow-md cursor-pointer hover:bg-gray-200 transition">
               <Pencil className="text-gray-600" size={16} />
-            </div>
+            </label>
+            <input id="photo-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h2 className="text-2xl font-bold text-gray-800">MD MYDUL ISLAM</h2>
-            <p className="text-gray-600">mydulcse62.niter@gmail.com</p>
+            <h2 className="text-2xl font-bold text-gray-800">{currentUser?.name}</h2>
+            <p className="text-gray-600">{currentUser?.email}</p>
           </div>
         </CardContent>
       </Card>
