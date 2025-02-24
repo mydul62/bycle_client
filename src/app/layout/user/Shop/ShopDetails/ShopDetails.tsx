@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { FiStar } from "react-icons/fi";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -8,7 +7,10 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "@/app/redux/api/features/product/productSlice";
 import ShopCard from "@/app/Components/models/shopCard/ShopCard";
 import { useState } from "react";
-import { Icart } from "@/app/types/types";
+import { Icart, IProduct } from "@/app/types/types";
+import ShopDetailsSkeleton from "@/app/Components/skeletons/DetailpageSkeleton/DetailpageSkeleton";
+import { toast } from "sonner";
+
 
 const ShopDetails = () => {
   const [cycleColor, setCycleColor] = useState<string>("");
@@ -17,17 +19,24 @@ const ShopDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { data, isLoading } = useGetSingleProductQuery(id);
-  const { data: bicycles, isLoading: isBicyclesLoading } = useGetAllProductQuery(undefined);
+
+  const { data: bicycles, isLoading: isBicyclesLoading } = useGetAllProductQuery({});
   const bicycle = data?.data;
 
   // Handle quantity change
   const handleQuantityChange = (value: number) => {
-    setQuantity(value > 0 ? value : 1); // Ensure quantity is at least 1
+    if (bicycle && value <= bicycle.stock && value > 0) {
+      setQuantity(value); // Ensure quantity is within the stock limit and greater than 0
+    } else {
+      // If quantity exceeds stock, show a toast
+      if (value > bicycle?.stock) {
+        toast.error('Insufficient stock!');
+      }
+      if (value <= 0) {
+        toast.error('Quantity must be at least 1');
+      }
+    }
   };
-
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-screen text-lg">Loading...</div>;
-  }
 
   const newBicycle: Icart | undefined = bicycle
     ? {
@@ -43,9 +52,15 @@ const ShopDetails = () => {
     : undefined;
 
   const handleAddToCart = () => {
-    if (newBicycle) {
-      dispatch(addToCart({ ...newBicycle }));
-      navigate("/shoppingcart");
+    if (!cycleColor) {
+      toast.error('Please select a color!');
+    } else if (bicycle && newquality > bicycle.stock) {
+      toast.error('Not enough stock!');
+    } else {
+      if (newBicycle) {
+        dispatch(addToCart({ ...newBicycle }));
+        navigate("/shoppingcart");
+      }
     }
   };
 
@@ -72,72 +87,82 @@ const ShopDetails = () => {
       </div>
 
       <div className="p-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 py-10 rounded-xl">
-          {/* Image Section */}
-          <div className="flex justify-center">
-            <img
-              src={bicycle?.image_url || "/placeholder.jpg"}
-              alt={bicycle?.name || "Bicycle"}
-              className="w-full h-auto"
-            />
-          </div>
-
-          {/* Product Details Section */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              {[...Array(4)].map((_, index) => (
-                <FiStar key={index} className="text-yellow-400 text-lg" />
-              ))}
-              <FiStar className="text-gray-300 text-lg" />
+        {isLoading ? (
+          <div className="flex justify-center items-center h-screen text-lg"><ShopDetailsSkeleton /></div>
+        ) : (
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 py-10 rounded-xl">
+            {/* Image Section */}
+            <div className="flex justify-center">
+              <img
+                src={bicycle?.image_url || "/placeholder.jpg"}
+                alt={bicycle?.name || "Bicycle"}
+                className="w-full h-auto"
+              />
             </div>
 
-            <h1 className="text-4xl font-bold text-gray-800">{bicycle?.price} tk</h1>
-            <p className="text-gray-600 mt-4">{bicycle?.description}</p>
-
-            {/* Color Options */}
-            <div className="mt-6">
-              <h2 className="text-lg font-semibold">Color</h2>
-              <div className="flex gap-2 mt-2">
-                {bicycle?.colors?.map((color: { _id: string; hex: string; name: string }) => (
-                  <div
-                    key={color._id}
-                    onClick={() => setCycleColor(color.hex)}
-                    className={`w-8 h-8 rounded-sm cursor-pointer border ${
-                      cycleColor === color.hex ? "border-black" : ""
-                    }`}
-                    style={{ backgroundColor: color.hex }}
-                    title={color.name}
-                  ></div>
+            {/* Product Details Section */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                {[...Array(4)].map((_, index) => (
+                  <FiStar key={index} className="text-yellow-400 text-lg" />
                 ))}
+                <FiStar className="text-gray-300 text-lg" />
+              </div>
+
+              <h1 className="text-4xl font-bold text-gray-800">{bicycle?.price} tk</h1>
+              <p className="text-gray-600 mt-4">{bicycle?.description}</p>
+
+              {/* Color Options */}
+              <div className="mt-6">
+                <h2 className="text-lg font-semibold">Color</h2>
+                <div className="flex gap-2 mt-2">
+                  {bicycle?.colors?.map((color: { _id: string; hex: string; name: string }) => (
+                    <div
+                      key={color._id}
+                      onClick={() => setCycleColor(color.hex)}
+                      className={`w-8 h-8 rounded-sm cursor-pointer border ${
+                        cycleColor === color.hex ? "border-black border-2" : ""
+                      }`}
+                      style={{ backgroundColor: color.hex }}
+                      title={color.name}
+                    ></div>
+                  ))}
+                </div>
+                <div className="my-4">
+                  <h2 className="text-xl">
+                    Stock: {bicycle?.stock > 0 ? bicycle?.stock : "Out of Stock"}
+                  </h2>
+                </div>
+              </div>
+
+              {/* Quantity & Buy Now */}
+              <div className="flex items-center gap-4 mt-6">
+                <input
+                  type="number"
+                  value={newquality}
+                  onChange={(e) => handleQuantityChange(Number(e.target.value))}
+                  className="w-16 text-center border rounded-md"
+                  min={1}
+                  max={bicycle?.stock || 1}
+                />
+                <Button
+                  disabled={!cycleColor}
+                  onClick={handleAddToCart}
+                  className="text-white"
+                >
+                  Buy now
+                </Button>
+              </div>
+
+              {/* Product Meta Info */}
+              <div className="text-sm text-gray-500 mt-6">
+                <p>SKU: {bicycle?.sku || "N/A"}</p>
+                <p>Category: {bicycle?.category || "N/A"}</p>
+                <p>Product ID: {bicycle?._id || "N/A"}</p>
               </div>
             </div>
-
-            {/* Quantity & Buy Now */}
-            <div className="flex items-center gap-4 mt-6">
-              <input
-                type="number"
-                value={newquality}
-                onChange={(e) => handleQuantityChange(Number(e.target.value))}
-                className="w-16 text-center border rounded-md"
-                min={1}
-              />
-              <Button
-                disabled={!cycleColor}
-                onClick={handleAddToCart}
-                className="bg-[#1B3E41] text-white"
-              >
-                Buy now
-              </Button>
-            </div>
-
-            {/* Product Meta Info */}
-            <div className="text-sm text-gray-500 mt-6">
-              <p>SKU: {bicycle?.sku || "N/A"}</p>
-              <p>Category: {bicycle?.category || "N/A"}</p>
-              <p>Product ID: {bicycle?._id || "N/A"}</p>
-            </div>
           </div>
-        </div>
+        )}
 
         {/* Tabs Section */}
         <div className="max-w-7xl mx-auto mt-10">
@@ -165,12 +190,15 @@ const ShopDetails = () => {
           </Tabs>
         </div>
       </div>
-          {/* Related Products */}
-          <div className="mx-auto max-w-7xl px-4 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {bicycles?.data?.slice(0, 3)?.map((bike) => (
-          <ShopCard key={bike._id} bike={bike} />
-        ))}
-      </div>
+
+      {/* Related Products */}
+      {!isBicyclesLoading && (
+        <div className="mx-auto max-w-7xl px-4 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {bicycles?.data?.slice(0, 3)?.map((bike: IProduct) => (
+            <ShopCard key={bike._id} bike={bike} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

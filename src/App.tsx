@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom"
 import Navbar from "./app/Components/shared/navbar/Navbar"
 import Footer from "./app/Components/models/homeComponents/footer/Footer"
+import CartView from "./app/Components/viewCardDrowe/CartView"
 
 
 
@@ -13,6 +14,7 @@ function App() {
      <Outlet></Outlet>
      </div>
      <Footer></Footer>
+     <CartView></CartView>
     </>
   )
 }

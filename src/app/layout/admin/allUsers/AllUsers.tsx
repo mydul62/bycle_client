@@ -1,7 +1,9 @@
-import { useGetAllUsersQuery } from "@/app/redux/api/features/auth/authApi";
+import { useDeleteUserMutation, useGetAllUsersQuery } from "@/app/redux/api/features/auth/authApi";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
-import { Loader2, AlertTriangle, CheckCircle, XCircle, Shield } from "lucide-react";
+import { AlertTriangle, Shield, XCircle, CheckCircle, Edit, Trash } from "lucide-react";
+import AllUsersSkeleton from "@/app/Components/skeletons/AllUsersSkeleton";
+import { toast } from "sonner";
 
 // Define TypeScript type for User
 interface User {
@@ -13,16 +15,12 @@ interface User {
 }
 
 const AllUsers = () => {
+  const [deleteUser] = useDeleteUserMutation();
   const { data, error, isLoading } = useGetAllUsersQuery(undefined);
   const users: User[] = data?.data || [];
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-40">
-        <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-        <p className="ml-2 text-blue-500">Loading users...</p>
-      </div>
-    );
+    return <AllUsersSkeleton />; // Use AllUsersSkeleton when loading
   }
 
   if (error) {
@@ -34,6 +32,16 @@ const AllUsers = () => {
     );
   }
 
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteUser(id).unwrap();
+      toast.success("User deleted successfully!"); // Toast on success
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      toast.error("Failed to delete user."); // Toast on error
+    }
+  };
+
   return (
     <Card className="p-6 rounded-none max-w-full w-[92%] mx-auto border-none">
       <h1 className="text-2xl font-semibold mb-4">All Users</h1>
@@ -44,6 +52,7 @@ const AllUsers = () => {
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead className="text-center">Role & Status</TableHead>
+              <TableHead className="text-center">Actions</TableHead> {/* New column */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -70,6 +79,23 @@ const AllUsers = () => {
                         <span className="text-green-500">Active</span>
                       </>
                     )}
+                  </div>
+                </TableCell>
+                {/* Action Buttons */}
+                <TableCell className="text-center">
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      // onClick={() => handleUpdateRole(user._id)}
+                      className="text-yellow-500 hover:text-yellow-700"
+                    >
+                      <Edit className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user._id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash className="h-5 w-5" />
+                    </button>
                   </div>
                 </TableCell>
               </TableRow>

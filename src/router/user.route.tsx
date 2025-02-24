@@ -12,9 +12,9 @@ import ShoppingCart from "@/app/layout/user/shopingCart/ShoppingCard";
 import ShopDetails from "@/app/layout/user/Shop/ShopDetails/ShopDetails";
 
 
-export const userDashboardpath: TuserPath[] = [
-           
-]
+
+
+
 export const userPaths: TuserPath[] = [
   {
     name: "Home",
@@ -59,4 +59,5 @@ export const userPaths: TuserPath[] = [
     path: "/shopdetails/:id",
     element: <ShopDetails />,
   },
+ 
 ];

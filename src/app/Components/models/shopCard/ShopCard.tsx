@@ -7,7 +7,7 @@ import { Link } from "react-router-dom"
   bike: IProduct ;
  }
 const ShopCard = ({bike}:Tbike) => {
-console.log(bike)
+
 
   return (
     <div

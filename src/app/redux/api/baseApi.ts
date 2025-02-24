@@ -6,13 +6,13 @@ import { RootState } from '../store';
 
 
 const baseQuery = fetchBaseQuery({
+  // baseUrl: 'https://bycle-server.vercel.app/api',
   baseUrl: 'http://localhost:5000/api',
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.token;
 
     if (token) {
-    console.log(token)
       headers.set('authorization', `${token}`);
     }
 

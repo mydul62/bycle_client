@@ -1,4 +1,4 @@
-import React from "react";
+
 import {
   Select,
   SelectContent,
@@ -35,7 +35,7 @@ interface Order {
 
 export default function AllOrders() {
   const { data, error, isLoading } = useGetAllOrderQuery(undefined);
-
+ console.log(data)
   if (isLoading) return <p className="text-center py-4">Loading orders...</p>;
   if (error) return <p className="text-center py-4 text-red-500">Failed to fetch orders</p>;
 

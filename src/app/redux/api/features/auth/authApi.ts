@@ -31,7 +31,7 @@ const authApi = baseApi.injectEndpoints({
     // Get Single User (Admin/User)
     getSingleUser: builder.query({
       query: () => ({
-        url: '/singleuser',
+        url: 'auth/sigleusr',
         method: 'GET',
       }),
     }),
@@ -39,7 +39,7 @@ const authApi = baseApi.injectEndpoints({
     // Update User Profile (Admin/User)
     updateUser: builder.mutation({
       query: (userData) => ({
-        url: '/updateuser',
+        url: 'auth//updateuser',
         method: 'PUT',
         body: userData,
       }),
@@ -48,7 +48,7 @@ const authApi = baseApi.injectEndpoints({
     // Update User Role (Admin only)
     updateRole: builder.mutation({
       query: ({ id, role }) => ({
-        url: `/updateRole/${id}`,
+        url: `auth//updateRole/${id}`,
         method: 'PUT',
         body: { role },
       }),
@@ -57,7 +57,7 @@ const authApi = baseApi.injectEndpoints({
     // Delete User (Admin only)
     deleteUser: builder.mutation({
       query: (id) => ({
-        url: `/deletedUser/${id}`,
+        url: `auth//deletedUsers/${id}`,
         method: 'DELETE',
       }),
     }),
@@ -65,7 +65,7 @@ const authApi = baseApi.injectEndpoints({
     // Change Password (Admin/User)
     changePassword: builder.mutation({
       query: (passwordData) => ({
-        url: '/changePassword',
+        url: 'auth/changePassword',
         method: 'PUT',
         body: passwordData,
       }),

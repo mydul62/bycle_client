@@ -3,12 +3,18 @@ import { baseApi } from "../../baseApi";
 export const ProductApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
       // Get all products
-        getAllProduct: builder.query({
-            query: () => ({
-                url: `/bycles`,
-                method: "GET",
-            }),
-        }),
+      getAllProduct: builder.query({
+  query: ({ search, sort, minPrice, maxPrice }) => ({
+    url: `/bycles`,
+    method: "GET",
+    params: {
+      search: search || undefined,
+      sort: sort || undefined,
+      minPrice: minPrice || undefined,
+      maxPrice: maxPrice || undefined,
+    },
+  }),
+}),
 
         //  Get single product
         getSingleProduct: builder.query({

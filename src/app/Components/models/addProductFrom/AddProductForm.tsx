@@ -28,7 +28,7 @@ interface ProductFormData {
 }
 
 export default function AddProductForm() {
-  const { register, handleSubmit, control, setValue, watch } =
+  const { register, handleSubmit, control, setValue } =
     useForm<ProductFormData>({
       defaultValues: {
         brand: "Linus",

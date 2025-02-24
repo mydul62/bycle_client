@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,8 +14,34 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRegisterMutation } from "@/app/redux/api/features/auth/authApi";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
+// --------------------------------------------------
+// Type Guards to check error shapes
+// --------------------------------------------------
+function isFetchBaseQueryError(
+  error: unknown
+): error is FetchBaseQueryError {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error
+  );
+}
+
+function isErrorWithMessage(
+  error: unknown
+): error is { message: string } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error
+  );
+}
+
+// --------------------------------------------------
 // Define the TypeScript type for the form data
+// --------------------------------------------------
 type RegistrationFormData = {
   name: string;
   email: string;
@@ -28,7 +55,7 @@ type RegistrationFormData = {
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  const [register, { isLoading, error }] = useRegisterMutation();
+  const [registerUser, { isLoading, error }] = useRegisterMutation();
 
   const form = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
@@ -44,7 +71,12 @@ export default function RegisterForm() {
     },
   });
 
-  const { control, handleSubmit, watch, formState: { errors } } = form;
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = form;
 
   const password = watch("password");
   const passwordConfirm = watch("passwordConfirm");
@@ -58,10 +90,27 @@ export default function RegisterForm() {
     dateOfBirth,
     photo,
   }) => {
-    console.log("Form Submitted:", { name, email, password, phone, gender, dateOfBirth, photo });
+    console.log("Form Submitted:", {
+      name,
+      email,
+      password,
+      phone,
+      gender,
+      dateOfBirth,
+      photo,
+    });
 
     try {
-      const res = await register({ name, email, password, phone, gender, dateOfBirth, photo }).unwrap();
+      const res = await registerUser({
+        name,
+        email,
+        password,
+        phone,
+        gender,
+        dateOfBirth,
+        photo,
+      }).unwrap();
+
       if (res.success) {
         navigate("/login");
       }
@@ -80,8 +129,10 @@ export default function RegisterForm() {
           </p>
         </div>
       </div>
+
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Name & Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={control}
@@ -111,6 +162,7 @@ export default function RegisterForm() {
             />
           </div>
 
+          {/* Password & Confirm Password */}
           <FormField
             control={control}
             name="password"
@@ -140,6 +192,7 @@ export default function RegisterForm() {
             )}
           />
 
+          {/* Phone & Gender */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={control}
@@ -169,6 +222,7 @@ export default function RegisterForm() {
             />
           </div>
 
+          {/* Date of Birth & Photo */}
           <FormField
             control={control}
             name="dateOfBirth"
@@ -195,11 +249,19 @@ export default function RegisterForm() {
               </FormItem>
             )}
           />
+
+          {/* Error Message Display */}
           {error && (
             <p className="text-red-500 text-sm my-2">
-              {error?.data?.message || "Registration failed"}
+              {isFetchBaseQueryError(error) &&
+              error.data &&
+              isErrorWithMessage(error.data)
+                ? error.data.message
+                : "Registration failed"}
             </p>
           )}
+
+          {/* Submit Button */}
           <Button
             disabled={isLoading || password !== passwordConfirm}
             type="submit"
@@ -209,6 +271,7 @@ export default function RegisterForm() {
           </Button>
         </form>
       </Form>
+
       <p className="text-sm text-gray-600 text-center my-3">
         Already have an account?{" "}
         <Link to="/login" className="text-primary">

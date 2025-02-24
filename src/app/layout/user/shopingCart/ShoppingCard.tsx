@@ -1,19 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FaTruck, FaRegTimesCircle } from "react-icons/fa";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/app/redux/hook";
 import { getTotalPrice, removeFromCart, updateQuantity } from "@/app/redux/api/features/product/productSlice";
 import { RootState } from "@/app/redux/store";
 
+import ShoppingCartSkeleton from "@/app/Components/skeletons/ShoppingCartSkeleton";
+
 const ShoppingCart: React.FC = () => {
-const navigate = useNavigate()
-  const carts = useAppSelector((state) => state.Product.items);
-  console.log(carts)
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const carts = useAppSelector((state) => state.Product.items);
   const totalPrice = useAppSelector((state: RootState) => getTotalPrice(state.Product));
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [processing, setProcessing] = useState<boolean>(false); // Processing state
+
+  useEffect(() => {
+    if (carts.length > 0) {
+      setLoading(false); // Set loading to false when carts data is available
+    }
+  }, [carts]);
 
   // Track quantity per product
   const [quantities, setQuantities] = useState<Record<string, number>>(
@@ -25,6 +34,18 @@ const navigate = useNavigate()
     const newQuantity = value > 0 ? value : 1; // Ensure quantity is at least 1
     setQuantities((prev) => ({ ...prev, [id]: newQuantity }));
     dispatch(updateQuantity({ _id: id, quantity: newQuantity }));
+  };
+
+  if (loading || !carts) {
+    return <ShoppingCartSkeleton />;  // Display skeleton if data is loading
+  }
+
+  // Handle checkout button click
+  const handleCheckout = () => {
+    setProcessing(true); // Set processing to true
+    setTimeout(() => {
+      navigate('/checkout'); // Navigate to checkout after 1 minute
+    }, 1000); // 60 seconds = 1 minute
   };
 
   return (
@@ -120,8 +141,12 @@ const navigate = useNavigate()
         </div>
 
         {/* Checkout Button */}
-        <Button onClick={()=>{navigate('/checkout')}}  className="w-full bg-red-500 hover:bg-red-600 text-white py-8 text-lg">
-          Proceed to checkout
+        <Button 
+          onClick={handleCheckout} 
+          className={`w-full bg-red-500 hover:bg-red-600 text-white py-8 text-lg ${processing ? "cursor-not-allowed opacity-50" : ""}`}
+          disabled={processing} // Disable button while processing
+        >
+          {processing ? "Please wait a minute..." : "Proceed to checkout"}
         </Button>
       </div>
     </div>

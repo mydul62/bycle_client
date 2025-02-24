@@ -5,8 +5,8 @@ export default function BicyclingExperience() {
   const [open, setOpen] = useState(false);
 
   return (
-    <section className="bg-gray-100 mt-24 lg:mt-0">
-      <div className="container mx-auto w-[90%] flex gap-5 py-[150px] pt-[300px] flex-col md:flex-row items-center rounded-lg">
+    <section className="bg-gray-100 pt-[420px] lg:pt-[280px] ">
+      <div className="container mx-auto w-[90%] flex gap-5  flex-col md:flex-row items-center rounded-lg">
         <div className="md:w-1/2 text-left">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             The best bicycling experience

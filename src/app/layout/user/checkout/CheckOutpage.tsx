@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,54 +7,69 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/app/redux/hook";
 import { clearCart, getTotalPrice } from "@/app/redux/api/features/product/productSlice";
 import { useCreateOrderMutation } from "@/app/redux/api/features/order/orderApi";
+import { useGetSingleUserQuery } from "@/app/redux/api/features/auth/authApi";
+
+// Import Sonner for toast notifications
+import { toast } from "sonner";
 
 export default function CheckoutPage() {
-const navigate = useNavigate()
-const dispatch = useAppDispatch()
-  const [createOrder, { isLoading: isCreating, error: createError }] = useCreateOrderMutation();
+  const dispatch = useAppDispatch();
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [createOrder] = useCreateOrderMutation();
   const { register, handleSubmit } = useForm();
   const carts = useAppSelector((state) => state.Product.items);
   const totalPrice = useAppSelector((state) => getTotalPrice(state.Product));
-const email= "abc@gmail.com";
+  const { data: user } = useGetSingleUserQuery(undefined);
+  const email = user?.data?.email;
+
   // Checkbox state
   const [termsChecked, setTermsChecked] = useState<boolean>(false);
 
   const onSubmit = async (data: any) => {
-    const products = carts.map(cart => ({
-      product: cart._id, // Assuming cart.id contains the product ID
-      quantity: cart.quantity,
-      price: cart.price,
-    }));
-  
-    const newData = { ...data, products, totalPrice, email };
+    setProcessing(true); // Start the processing immediately when the button is clicked
 
-    try {
-      const res = await createOrder(newData).unwrap();
-  
-      if (res.success) {
-        alert("Order Created");
-        console.log(res.data.checkout_url);
-  
-        // Ensure checkout_url is absolute before redirecting
-        const checkoutUrl = res.data.checkout_url.startsWith("http")
-          ? res.data.checkout_url
-          : `https://${res.data.checkout_url}`;
-  
-        window.location.href = checkoutUrl; // Redirects to the correct URL
-        dispatch(clearCart());
+    // Simulate a wait period of 3 seconds before actually placing the order
+    setTimeout(async () => {
+      const products = carts.map(cart => ({
+        product: cart._id, // Assuming cart.id contains the product ID
+        quantity: cart.quantity,
+        price: cart.price,
+      }));
+
+      const newData = { ...data, products, totalPrice, email };
+
+      try {
+        const res = await createOrder(newData).unwrap();
+
+        if (res.success) {
+          // Instead of alert(), use Sonner's toast
+          toast.success("Order Created Successfully!");
+          console.log(res.data.checkout_url);
+
+          // Ensure checkout_url is absolute before redirecting
+          const checkoutUrl = res.data.checkout_url.startsWith("http")
+            ? res.data.checkout_url
+            : `https://${res.data.checkout_url}`;
+
+          window.location.href = checkoutUrl; // Redirects to the correct URL
+          dispatch(clearCart());
+        }
+      } catch (error) {
+        // In case of an error, use Sonner to show an error toast
+        toast.error("There was an error processing your order.");
+        console.log(error);
+      } finally {
+        setProcessing(false); // Reset processing state after the order is created
       }
-    } catch (error) {
-      console.log(error);
-    }
+    }, 2000); 
   };
-  
-  
+
   return (
-    <div className=" ">
+    <div className="">
       <div style={{ backgroundImage: "url('https://i.ibb.co.com/k2rdkVtn/image-6.jpg')", backgroundRepeat: "no-repeat", backgroundSize: "cover" }} className="h-[500px] relative">
         <div className="flex justify-center items-center absolute top-0 left-0 w-full h-full bg-[#363535b4]">
           <div className="space-y-4 mt-10">
@@ -167,20 +182,19 @@ const email= "abc@gmail.com";
 
             {/* Terms & Conditions */}
             <div className="flex items-center mt-6">
-      <Checkbox
-        id="terms"
-        checked={termsChecked}
-        onCheckedChange={(checked) => setTermsChecked(checked === true)}
-        // Ensuring only true/false
-      />
-      <label htmlFor="terms" className="ml-2 text-sm">
-        I have read and agree to the website <span className="font-bold text-red-600">terms and conditions *</span>
-      </label>
-    </div>
+              <Checkbox
+                id="terms"
+                checked={termsChecked}
+                onCheckedChange={(checked) => setTermsChecked(checked === true)}
+              />
+              <label htmlFor="terms" className="ml-2 text-sm">
+                I have read and agree to the website <span className="font-bold text-red-600">terms and conditions *</span>
+              </label>
+            </div>
 
             {/* Place Order Button */}
             <Button type="submit" className="rounded-none mt-6 p-6 bg-red-500 hover:bg-red-600" disabled={!termsChecked}>
-              Place order
+              {processing ? <span>Wait while processing....</span> : <span>Place order</span>}
             </Button>
           </div>
         </form>

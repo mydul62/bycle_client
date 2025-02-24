@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const About = () => {
   return (
     <div>
-     <div style={{ backgroundImage: "url('https://i.ibb.co.com/k2rdkVtn/image-6.jpg')", backgroundRepeat: "no-repeat", backgroundSize: "cover" }} className="h-[500px] relative">
+     <div style={{ backgroundImage: "url('https://i.ibb.co.com/k2rdkVtn/image-6.jpg')", backgroundRepeat: "no-repeat", backgroundSize: "cover" }} className="h-[300px] md:h-[400px] lg:h-[500px] relative">
         <div className="flex justify-center items-center absolute top-0 left-0 w-full h-full bg-[#363535b4]">
           <div className="space-y-4 mt-10">
             <h2 className="text-6xl text-white font-extrabold text-center">About</h2>
