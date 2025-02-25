@@ -9,6 +9,7 @@ import { getTotalPrice, removeFromCart, updateQuantity } from "@/app/redux/api/f
 import { RootState } from "@/app/redux/store";
 
 import ShoppingCartSkeleton from "@/app/Components/skeletons/ShoppingCartSkeleton";
+import { Input } from "@/components/ui/input";
 
 const ShoppingCart: React.FC = () => {
   const navigate = useNavigate();
@@ -101,11 +102,13 @@ const ShoppingCart: React.FC = () => {
                     </TableCell>
                     <TableCell>${item.price.toFixed(2)}</TableCell>
                     <TableCell>
-                      <input
+                      <Input
                         type="number"
-                        value={quantities[item._id] || 1}
-                        onChange={(e) => handleQuantityChange(item._id, Number(e.target.value))}
-                        className="w-16 text-center border rounded-md"
+                        defaultValue={quantities[item._id] || 1}
+                        inputMode="numeric" 
+                        onChange={(e) => handleQuantityChange(item._id, 
+                        Number(e.target.value))}
+                        className="w-16 text-center border rounded-md appearance-auto"
                         min={1}
                       />
                     </TableCell>

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+// import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { FiStar } from "react-icons/fi";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetAllProductQuery, useGetSingleProductQuery } from "@/app/redux/api/features/product/productApi";
@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Icart, IProduct } from "@/app/types/types";
 import ShopDetailsSkeleton from "@/app/Components/skeletons/DetailpageSkeleton/DetailpageSkeleton";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 
 const ShopDetails = () => {
@@ -137,13 +138,14 @@ const ShopDetails = () => {
 
               {/* Quantity & Buy Now */}
               <div className="flex items-center gap-4 mt-6">
-                <input
+                <Input
                   type="number"
-                  value={newquality}
+                  defaultValue={newquality}
                   onChange={(e) => handleQuantityChange(Number(e.target.value))}
-                  className="w-16 text-center border rounded-md"
+                  className="w-16 text-center border rounded-md appearance-auto"
                   min={1}
                   max={bicycle?.stock || 1}
+                  inputMode="numeric" 
                 />
                 <Button
                   disabled={!cycleColor}
@@ -165,7 +167,7 @@ const ShopDetails = () => {
         )}
 
         {/* Tabs Section */}
-        <div className="max-w-7xl mx-auto mt-10">
+        {/* <div className="max-w-7xl mx-auto mt-10">
           <Tabs defaultValue="description">
             <TabsList className="flex justify-start mb-5 border-b">
               <TabsTrigger value="description" className="px-6 py-3 text-lg font-semibold border-r">
@@ -188,7 +190,7 @@ const ShopDetails = () => {
               <p className="text-gray-700">User reviews will be displayed here.</p>
             </TabsContent>
           </Tabs>
-        </div>
+        </div> */}
       </div>
 
       {/* Related Products */}

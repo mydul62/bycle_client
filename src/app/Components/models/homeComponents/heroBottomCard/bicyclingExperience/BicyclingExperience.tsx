@@ -6,15 +6,17 @@ export default function BicyclingExperience() {
 
   return (
     <section className="bg-gray-100 pt-[420px] lg:pt-[280px] ">
-      <div className="container mx-auto w-[90%] flex gap-5  flex-col md:flex-row items-center rounded-lg">
+      <div className="container mx-auto w-[90%] flex gap-12  flex-col md:flex-row items-center rounded-lg">
         <div className="md:w-1/2 text-left">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             The best bicycling experience
           </h2>
           <p className="text-gray-700 mb-6">
-            Welcome to Yokoo! We are one of the biggest bicycle-families in the world.
-            Our services include all types of repair, search of a perfect bike for every customer,
-            sport events organization, and much more. Join our community and become a part of the bike-family.
+          Welcome to Yokoo – Your Ultimate Bicycle Destination!
+
+At Yokoo, we take pride in being one of the largest bicycle communities in the world. Whether you're a casual rider or a professional cyclist, we have the perfect bike for you. Our dedicated team ensures that every customer finds their ideal ride, with a wide selection of high-quality bicycles and accessories to choose from.
+<br />
+Beyond just selling bikes, we offer expert repair services, organize thrilling cycling events, and create a vibrant community for biking enthusiasts. Join the Yokoo family today and experience the joy of cycling like never before! 
           </p>
           <button className="bg-red-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-red-600 transition">
             More about our mission

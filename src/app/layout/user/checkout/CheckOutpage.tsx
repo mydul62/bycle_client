@@ -15,6 +15,7 @@ import { useGetSingleUserQuery } from "@/app/redux/api/features/auth/authApi";
 
 // Import Sonner for toast notifications
 import { toast } from "sonner";
+import { districts } from "@/app/data/data";
 
 export default function CheckoutPage() {
   const dispatch = useAppDispatch();
@@ -95,10 +96,10 @@ const name =singleUser?.name
                 <Label htmlFor="firstName">First name *</Label>
                 <Input value={name} disabled className="rounded-none py-6" id="firstName" {...register("firstName", { required: true })} />
               </div>
-              <div>
+              {/* <div>
                 <Label  htmlFor="lastName">Last name *</Label>
                 <Input value={"customer"} className="rounded-none py-6" id="lastName" {...register("lastName", { required: true })} />
-              </div>
+              </div> */}
               <div>
                 <Label htmlFor="email">Email *</Label>
                 <Input value={email} disabled className="rounded-none py-6" id="email" {...register("email", { required: true })} />
@@ -122,16 +123,16 @@ const name =singleUser?.name
               </div>
               <div>
                 <Label htmlFor="district">District *</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an option..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dhaka">Dhaka</SelectItem>
-                    <SelectItem value="chattogram">Chattogram</SelectItem>
-                    <SelectItem value="khulna">Khulna</SelectItem>
-                  </SelectContent>
-                </Select>
+               <Select>
+      <SelectTrigger>
+        <SelectValue placeholder="Select a district..." />
+      </SelectTrigger>
+      <SelectContent>
+        {districts.map((district) => (
+          <SelectItem key={district} value={district.toLowerCase()}>{district}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
               </div>
               <div>
                 <Label htmlFor="postcode">Postcode / ZIP (optional)</Label>

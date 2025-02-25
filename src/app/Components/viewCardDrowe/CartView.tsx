@@ -70,7 +70,7 @@ const CartView = () => {
           </h3>
         </div>
         <Link to={"/shoppingcart"}>
-          <Button  onClick={() => dispatch(setClose())} className="mt-4 bg-[#1E3A3A] text-white py-2 px-4 rounded">
+          <Button disabled={carts?.length === 0 }  onClick={() => dispatch(setClose())} className="mt-4 bg-[#1E3A3A] text-white py-2 px-4 rounded">
             Checkout
           </Button>
         </Link>
